@@ -6,9 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-
+@AllArgsConstructor
 @RestController
 @RequestMapping("/routes/*")
 public class RouteController {
@@ -19,11 +20,12 @@ public class RouteController {
     private List<Route> routeList;
 
     @GetMapping
-    public ResponseEntity<List<Route>> getRoutes() {
-        List<Route> routeList = routeService.getAll();
-        return ResponseEntity.ok(routeList);
+    public ResponseEntity<List<Route>> getAllRoutes() {
+        List<Route> routeList = routeService.getAllRoutes();
+        if (routeList == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.OK).body(routeList);
     }
-
     @PostMapping
     public ResponseEntity<List<Route>> createRoute(@RequestBody Route route) {
         routeService.save(route);
@@ -35,14 +37,22 @@ public class RouteController {
         List<Route> routes = routeService.findByStartLocatin(startLocation);
         return routes;
     }
-   /* @GetMapping("traffic/")
+    @PutMapping("/update/{id}")
+    public ResponseEntity<List<Route>> addVehicle(@RequestBody Route route) {
+        List<Route> vehicles = new ArrayList<>();
+        vehicles.add(new Route());
+        routeService.addRoute(route);
+        return new ResponseEntity<>(vehicles, HttpStatus.CREATED);
+    }
+
+  /*  @GetMapping("traffic/")
     public ResponseEntity<TrafficDetails> getGeoCooding(RestTemplate restTemplate) {
         StringBuilder builder = new StringBuilder("https://api.resrobot.se/v2.1/trip?");
         builder
                 .append("format=").append("json")
                 .append("&originId=").append("740000001")
                 .append("&destId=").append("740000003")
-                .append("&accessId=").append("<API_KEY_HERE>");
+                .append("&accessId=").append("<api.resrobot.se/v2.1/trip>");
 
         ResponseEntity<TrafficDetails> traffic = restTemplate
                 .getForEntity(builder.toString(), TrafficDetails.class);
@@ -50,13 +60,7 @@ public class RouteController {
 
         return ResponseEntity.ok(traffic.getBody());
     }*/
-
-
-    @PutMapping("/update/{id}")
-    public Route updateRoute(@PathVariable("id") long id, @RequestBody Route route) {
-        return routeService.updateRoute(id, route);
-    }
-
+    
     @DeleteMapping("/delete/{id}")
     public void deleteRoute(@PathVariable("id") long id) {
         routeService.deleteRoute(id);
