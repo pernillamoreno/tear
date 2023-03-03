@@ -12,10 +12,11 @@ import java.util.List;
 @Log4j2
 public class RouteService {
 
+
     @Autowired
     RouteRepository routeRepository;
 
-    public List<Route> getAll() {
+    public List<Route> getAllRoutes() {
         log.debug("All courses is being fetched");
         return routeRepository.findAll();
     }
@@ -45,9 +46,8 @@ public class RouteService {
     public void deleteRoute(long id) {
         routeRepository.deleteById(id);
     }
+
+    public Route addRoute(Route route) { {return routeRepository.save(route);
+    }
+    }
 }
-
-
-
-
-
